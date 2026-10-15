@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Método · Mapa de Doenças do SUS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --page: #f4f4f1; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+  --hair: #e1e0d9; --accent: #2a78d6; --ring: rgba(11, 11, 11, 0.10);
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark; --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --hair: #2c2c2a; --accent: #3987e5; --ring: rgba(255, 255, 255, 0.10);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark; --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+  --hair: #2c2c2a; --accent: #3987e5; --ring: rgba(255, 255, 255, 0.10);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--page); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 760px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px; }
+a { color: var(--accent); }
+h1 { font-size: 26px; line-height: 1.2; margin: 0 0 6px; text-wrap: balance; }
+h2 { font-size: 18px; margin: 32px 0 8px; text-wrap: balance; }
+p, li { color: var(--ink); }
+.sub { color: var(--ink-2); margin: 0 0 20px; }
+code, .cid { font-family: var(--mono); font-size: 0.92em; }
+.box { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 12px 16px; margin: 12px 0; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; border-bottom: 1px solid var(--hair); padding: 6px 8px; vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+.scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p><a href="index.html">← Voltar ao mapa</a></p>
+  <h1>Como o mapa é feito</h1>
+  <p class="sub">Atenção ambulatorial especializada do SUS (SIA), residentes no Brasil, 2014–2023.</p>
+
+  <h2>De onde vêm os dados</h2>
+  <p>Do Sistema de Informações Ambulatoriais do SUS (SIA), dados públicos do DATASUS. O paciente
+  é reconhecido por um identificador único criptografado, presente nos microdados públicos. Os
+  diagnósticos vêm do Boletim de Produção Ambulatorial Individualizado (BPA-I) e das APAC de
+  medicamentos de alto custo, quimioterapia, radioterapia e outros procedimentos, ligados pelo
+  mesmo identificador.</p>
+  <p>Cada doença é uma categoria da CID-10 com 3 caracteres (ex.: <span class="cid">I10</span>,
+  hipertensão). Sintomas (R), causas externas (V–Y), fatores de contato com serviços (Z) e códigos
+  especiais (U) ficam de fora. A00 (cólera) e A01 (febres tifoide e paratifoide) também: são o
+  primeiro código da tabela e aparecem como preenchimento padrão, sobretudo em exames
+  anatomopatológicos, que passaram a exigir CID em 2018.</p>
+
+  <h2>Quem entra</h2>
+  <ul>
+    <li>Identificador consistente: saem os que têm sinais de corresponder a mais de uma pessoa,
+    porque misturá-las criaria ligações falsas.</li>
+    <li>Dados demográficos plausíveis, sem valores usados como preenchimento padrão pelos sistemas.</li>
+    <li>Residência (município mais frequente nos registros) dentro do recorte.</li>
+  </ul>
+
+  <h2>O que é uma ligação</h2>
+  <p>Duas doenças se ligam quando aparecem no mesmo paciente mais vezes do que o acaso explicaria.
+  Para cada par medimos:</p>
+  <div class="box scroll"><table>
+    <tr><th>Medida</th><th>O que diz</th></tr>
+    <tr><td>RR</td><td>Quantas vezes mais pacientes têm as duas doenças do que se elas fossem independentes.
+      RR = 3 significa o triplo do esperado.</td></tr>
+    <tr><td>φ</td><td>Correlação entre ter uma e ter a outra, de 0 a 1. Pondera melhor doenças raras e
+      comuns; é o peso usado para desenhar e agrupar.</td></tr>
+    <tr><td>Teste</td><td>Teste exato de Fisher, com correção para múltiplas comparações
+      (Benjamini–Hochberg, 1%) sobre todos os pares possíveis.</td></tr>
+  </table></div>
+  <p>Com dezenas de milhões de pacientes, quase todo par sai "significativo". Por isso a ligação só
+  entra se o limite inferior do intervalo de confiança do RR for maior que 1 e se pelo menos
+  20 pacientes tiverem as duas doenças. Cada ligação também é comparada com o esperado
+  dentro de cada faixa de idade e sexo, o que separa as que existem só porque as duas doenças são
+  comuns na mesma idade.</p>
+
+  <h2>Direção: o que costuma vir antes</h2>
+  <p>Usamos o mês do primeiro registro de cada doença no SIA. Entre os pacientes que tiveram as duas
+  com 1 a 60 meses de distância, comparamos quantos tiveram cada ordem (teste binomial).
+  Doenças registradas pela primeira vez no mesmo mês não dão direção. Os dois primeiros anos de dados
+  servem só para reconhecer doenças que o paciente já tinha antes do período.</p>
+
+  <h2>Comunidades e pontes</h2>
+  <p><b>Comunidades</b> são grupos de doenças muito ligadas entre si e pouco ligadas ao resto, achadas
+  pelo algoritmo de Leiden (modularidade de Newman). Os nomes mostrados são as 3 doenças centrais de
+  cada grupo.</p>
+  <p><b>Doenças-ponte</b> são as que ficam no caminho mais curto entre muitos pares de doenças
+  (betweenness) ou que dividem as ligações entre várias comunidades (participação).</p>
+  <p><b>Gatilho ↔ desfecho</b>: para cada doença, a proporção das trajetórias dirigidas que saem dela
+  (−1, só inicia) ou chegam nela (+1, só encerra).</p>
+
+  <h2>Populações</h2>
+  <p>O mapa pode ser visto para todos os pacientes ou para um recorte por vez: sexo, faixa etária,
+  raça/cor ou região. Na faixa etária vale a idade em que cada doença foi registrada pela primeira vez,
+  então o mesmo paciente pode contribuir para mais de uma faixa, com as doenças de cada fase da vida.</p>
+
+  <h2>Limites que importam para a leitura</h2>
+  <ul>
+    <li>O SIA é atenção especializada. A atenção primária não está nele, então diabetes e hipertensão
+    costumam aparecer tarde, já com a complicação.</li>
+    <li>"Primeira ocorrência" é o primeiro registro no SIA, não o início da doença.</li>
+    <li>Uma pessoa com mais de um identificador vira duas, o que enfraquece ligações.</li>
+    <li>Ligações que são padrão de codificação de poucos serviços saem do mapa: mais da metade dos
+    pacientes veio dos 3 estabelecimentos que mais registram o par <em>e</em>, fora deles, a
+    associação some (limite superior do intervalo de confiança do RR abaixo de 1,25). Pouco dado
+    fora desses serviços não basta para retirar a ligação.</li>
+    <li>A raça/cor "Amarela" é registrada em excesso no SIA e não deve ser lida como tal.</li>
+    <li>Só aparecem doenças com pelo menos 100 pacientes e ligações com pelo menos
+    20. Nenhum dado individual é publicado.</li>
+  </ul>
+
+  <h2>Referências</h2>
+  <ul>
+    <li>Hidalgo CA et al. A dynamic network approach for the study of human phenotypes.
+    PLoS Comput Biol 2009;5:e1000353.</li>
+    <li>Jensen AB et al. Temporal disease trajectories condensed from population-wide registry data
+    covering 6.2 million patients. Nat Commun 2014;5:4022.</li>
+    <li>Traag VA, Waltman L, van Eck NJ. From Louvain to Leiden: guaranteeing well-connected
+    communities. Sci Rep 2019;9:5233.</li>
+  </ul>
+</div>
+</body>
+</html>

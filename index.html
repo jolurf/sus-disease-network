@@ -1,0 +1,619 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mapa de Doenças do SUS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --page: #f4f4f1;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --muted: #898781;
+  --hair: #e1e0d9;
+  --axis: #c3c2b7;
+  --accent: #2a78d6;
+  --accent-soft: rgba(42, 120, 214, 0.12);
+  --edge: rgba(137, 135, 129, 0.22);
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --s5: #e87ba4; --s6: #008300; --s7: #4a3aa7; --s8: #e34948;
+  --outras: #b9b7ae;
+  --div-neg: #2a78d6; --div-mid: #d6d4cc; --div-pos: #e34948;
+  --seq-1: #cde2fb; --seq-2: #86b6ef; --seq-3: #3987e5; --seq-4: #1c5cab; --seq-5: #0d366b;
+  --ring: rgba(11, 11, 11, 0.10);
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+    --hair: #2c2c2a; --axis: #383835; --accent: #3987e5; --accent-soft: rgba(57, 135, 229, 0.18);
+    --edge: rgba(195, 194, 183, 0.16);
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+    --outras: #5d5c57; --div-neg: #3987e5; --div-mid: #4a4945; --div-pos: #e66767;
+    --seq-1: #184f95; --seq-2: #256abf; --seq-3: #3987e5; --seq-4: #6da7ec; --seq-5: #b7d3f6;
+    --ring: rgba(255, 255, 255, 0.10);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+  --hair: #2c2c2a; --axis: #383835; --accent: #3987e5; --accent-soft: rgba(57, 135, 229, 0.18);
+  --edge: rgba(195, 194, 183, 0.16);
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --s5: #d55181; --s6: #008300; --s7: #9085e9; --s8: #e66767;
+  --outras: #5d5c57; --div-neg: #3987e5; --div-mid: #4a4945; --div-pos: #e66767;
+  --seq-1: #184f95; --seq-2: #256abf; --seq-3: #3987e5; --seq-4: #6da7ec; --seq-5: #b7d3f6;
+  --ring: rgba(255, 255, 255, 0.10);
+}
+* { box-sizing: border-box; }
+body { background: var(--page); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; }
+.wrap { max-width: 1440px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 48px; display: grid; gap: 16px; }
+header { display: grid; gap: 4px; }
+.aviso { margin: 0 0 8px; padding: 8px 12px; border: 1px solid var(--s4); border-radius: 6px;
+         background: color-mix(in srgb, var(--s4) 12%, transparent); color: var(--ink); font-size: 13px; }
+h1 { font-size: 22px; line-height: 1.2; margin: 0; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+.sub { color: var(--ink-2); margin: 0; max-width: 90ch; }
+.nums { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--ink-2); font-size: 13px; margin-top: 6px; }
+.nums b { color: var(--ink); font-variant-numeric: tabular-nums; font-weight: 600; }
+.links { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: 13px; margin-top: 4px; }
+.links a { color: var(--accent); }
+.bar { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: end; background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 10px 12px; }
+.ctl { display: grid; gap: 3px; }
+.ctl > span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+.seg { display: inline-flex; border: 1px solid var(--axis); border-radius: 6px; overflow: hidden; }
+.seg button { font: inherit; font-size: 13px; background: transparent; color: var(--ink-2); border: 0; padding: 5px 11px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--axis); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+.pops { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 10px 12px; display: grid; gap: 8px; }
+.pops-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.lbl { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+.pops-grid { display: grid; gap: 6px; }
+.pop-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pop-row > .lbl { width: 104px; flex: none; }
+.chip { font: inherit; font-size: 13px; border: 1px solid var(--axis); border-radius: 999px; padding: 4px 11px; background: transparent; color: var(--ink-2); cursor: pointer; }
+.chip:hover { border-color: var(--accent); color: var(--ink); }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+.chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+select, input[type="search"] { font: inherit; font-size: 13px; color: var(--ink); background: var(--surface); border: 1px solid var(--axis); border-radius: 6px; padding: 5px 8px; max-width: 100%; }
+input[type="search"] { width: 210px; font-family: var(--mono); }
+label.chk { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; color: var(--ink-2); cursor: pointer; padding-bottom: 5px; }
+button:focus-visible, select:focus-visible, input:focus-visible, .lnk:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 16px; align-items: start; }
+.stage { position: relative; background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; overflow: hidden; height: min(78vh, 820px); min-height: 420px; touch-action: none; }
+canvas { display: block; width: 100%; height: 100%; cursor: grab; }
+canvas.dragging { cursor: grabbing; }
+.zoom { position: absolute; right: 10px; top: 10px; display: grid; gap: 4px; }
+.zoom button { font: inherit; width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--axis); background: var(--surface); color: var(--ink); cursor: pointer; font-size: 16px; line-height: 1; }
+.legend { position: absolute; left: 10px; bottom: 10px; background: var(--surface); border: 1px solid var(--ring); border-radius: 6px; padding: 7px 9px; font-size: 12px; color: var(--ink-2); display: grid; gap: 3px; max-width: calc(100% - 20px); }
+.legend .row { display: flex; gap: 6px; align-items: center; }
+.sw { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.ramp { display: flex; height: 8px; width: 160px; border-radius: 4px; overflow: hidden; }
+.ramp i { flex: 1; }
+.ends { display: flex; justify-content: space-between; width: 160px; font-size: 11px; color: var(--muted); }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--ring); box-shadow: 0 4px 16px rgba(0,0,0,0.12); border-radius: 6px; padding: 7px 9px; font-size: 12px; max-width: 280px; color: var(--ink-2); z-index: 3; }
+.tip b { font-family: var(--mono); color: var(--ink); }
+.panel { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 14px; display: grid; gap: 12px; max-height: min(78vh, 820px); overflow: auto; }
+.panel h2 { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+.cid { font-family: var(--mono); font-weight: 600; }
+.big { font-family: var(--mono); font-size: 30px; font-weight: 600; line-height: 1; }
+.desc { font-size: 15px; font-weight: 500; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+.lst { display: grid; gap: 1px; }
+.lst .lnk { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 8px; align-items: baseline; padding: 4px 6px; border-radius: 4px; cursor: pointer; background: none; border: 0; font: inherit; color: inherit; text-align: left; width: 100%; }
+.lst .lnk:hover { background: var(--accent-soft); }
+.lst .lnk span:nth-child(2) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); font-size: 13px; }
+.lst .lnk span:last-child { font-variant-numeric: tabular-nums; font-size: 12px; color: var(--ink-2); }
+.hint { color: var(--ink-2); font-size: 13px; margin: 0; }
+.muted { color: var(--muted); font-size: 12px; }
+.clear { justify-self: start; font: inherit; font-size: 12px; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
+.tables { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+.card { background: var(--surface); border: 1px solid var(--ring); border-radius: 8px; padding: 14px; display: grid; gap: 10px; min-width: 0; align-content: start; }
+.card p { margin: 0; }
+.card h2 { margin: 0; font-size: 15px; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--hair); padding: 6px 8px; white-space: nowrap; }
+td { border-bottom: 1px solid var(--hair); padding: 6px 8px; vertical-align: top; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+tr.click { cursor: pointer; }
+tr.click:hover td { background: var(--accent-soft); }
+.notes { color: var(--ink-2); font-size: 12.5px; max-width: 110ch; display: grid; gap: 4px; }
+.notes p { margin: 0; }
+@media (max-width: 980px) {
+  .main, .tables { grid-template-columns: 1fr; }
+  .panel { max-height: none; }
+  .stage { height: 62vh; }
+}
+@media (max-width: 480px) {
+  .wrap { padding-inline: 16px; }
+  input[type="search"] { width: 100%; }
+  .ctl { width: 100%; }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="aviso" role="note"><strong>Versão preliminar.</strong> Resultados ainda não revisados por pares; as análises de sensibilidade estão em andamento e números podem mudar. Associação no registro não é causalidade.</p>
+    <h1 id="titulo">Mapa de doenças do SUS</h1>
+    <p class="sub">Cada ponto é uma categoria da CID-10 (3 caracteres). Duas doenças se ligam quando aparecem no mesmo paciente mais do que o acaso explicaria (φ, RR). Atenção ambulatorial especializada (SIA: BPA-I e APAC), <span id="recorte-txt">—</span>.</p>
+    <div class="nums" id="nums"></div>
+    <nav class="links" id="links" aria-label="Mais informações">
+      <a href="metodo.html">Como o mapa é feito</a>
+      <a id="baixar-nos" href="#" download>Doenças deste grafo (CSV)</a>
+      <a id="baixar-arestas" href="#" download>Ligações deste grafo (CSV)</a>
+    </nav>
+  </header>
+
+  <section class="pops" id="ctl-estrato" aria-label="População do grafo">
+    <div class="pops-head"><span class="lbl">População</span>
+      <span class="muted">Um recorte por vez: escolher um valor numa dimensão volta as outras para "Todos".</span></div>
+    <div class="pops-grid" id="pops"></div>
+  </section>
+
+  <div class="bar" role="toolbar" aria-label="Controles do mapa">
+    <div class="ctl"><span>Geometria</span>
+      <div class="seg" id="geo">
+        <button type="button" id="geo-rede" aria-pressed="true">Rede</button>
+        <button type="button" id="geo-umap" aria-pressed="false">UMAP</button>
+      </div>
+    </div>
+    <div class="ctl"><span>Cor</span>
+      <select id="cor" aria-label="Colorir por">
+        <option value="com">Comunidade (Leiden)</option>
+        <option value="part">Papel de ponte (participação)</option>
+        <option value="desf">Gatilho ↔ desfecho</option>
+      </select>
+    </div>
+    <div class="ctl"><span>Destacar comunidade</span>
+      <select id="fcom" aria-label="Destacar comunidade"><option value="">Todas</option></select>
+    </div>
+    <div class="ctl"><span>Destacar capítulo CID-10</span>
+      <select id="fcap" aria-label="Destacar capítulo"><option value="">Todos</option></select>
+    </div>
+    <div class="ctl"><span>Buscar</span>
+      <input type="search" id="busca" placeholder="I10, diabetes…" list="lista-cid" aria-label="Buscar CID ou nome" autocomplete="off">
+      <datalist id="lista-cid"></datalist>
+    </div>
+    <label class="chk"><input type="checkbox" id="esq" checked> Ligações fortes</label>
+  </div>
+
+  <div class="main">
+    <div class="stage" id="stage">
+      <canvas id="cv" aria-label="Mapa das doenças; use a busca ou as tabelas abaixo para navegar por teclado"></canvas>
+      <div class="zoom">
+        <button type="button" id="zin" aria-label="Aproximar">+</button>
+        <button type="button" id="zout" aria-label="Afastar">−</button>
+        <button type="button" id="zreset" aria-label="Enquadrar tudo">⤢</button>
+      </div>
+      <div class="legend" id="legenda"></div>
+      <div class="tip" id="tip" hidden></div>
+    </div>
+    <aside class="panel" id="painel" aria-live="polite"></aside>
+  </div>
+
+  <div class="tables">
+    <section class="card">
+      <h2>Comunidades</h2>
+      <div class="scroll"><table id="t-com"></table></div>
+    </section>
+    <section class="card">
+      <h2>Doenças-ponte</h2>
+      <p class="muted">Maior betweenness: por onde passam os caminhos mais curtos entre as especialidades (distância = 1/φ).</p>
+      <div class="scroll"><table id="t-pontes"></table></div>
+    </section>
+  </div>
+
+  <div class="notes">
+    <p><b>Como ler.</b> Na geometria Rede, a posição vem de um layout de força sobre as 8 ligações mais fortes de cada doença. No UMAP, duas doenças ficam perto quando co-ocorrem com as mesmas doenças, mesmo sem ligação direta.</p>
+    <p><b>Setas.</b> “Costuma vir antes/depois” compara, entre pacientes com as duas doenças registradas a 1–60 meses uma da outra, quantos tiveram cada ordem (teste binomial, FDR 1%). Primeira ocorrência = primeiro registro no SIA, não incidência.</p>
+    <p><b>Limites.</b> Atenção primária não está no SIA: diabetes e hipertensão entram tarde, pela complicação (por isso N18 e H36 aparecem antes de E11). Algumas ligações muito fortes entre capítulos podem refletir o serviço que codifica, não a clínica.</p>
+  </div>
+</div>
+
+<script type="application/json" id="dados">/*__DADOS__*/</script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const fmt = new Intl.NumberFormat("pt-BR");
+  const fmt2 = (v, d = 2) => v == null ? "—" : Number(v).toLocaleString("pt-BR", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+  // ---- dados do estrato ativo (trocados pelo seletor) ---------------------
+  let D = null, N = 0, idx, viz, sai, entra, raio, porBet, rankBet, comunidades, capDom;
+  function indexar() {
+    N = D.nos.id.length;
+    idx = new Map(D.nos.id.map((c, i) => [c, i]));
+    viz = Array.from({ length: N }, () => []);       // associações [j, phi, rr, c, esq]
+    for (const [i, j, p, rr, c, e] of D.arestas) { viz[i].push([j, p / 1000, rr, c, e]); viz[j].push([i, p / 1000, rr, c, e]); }
+    viz.forEach(l => l.sort((a, b) => b[1] - a[1]));
+    sai = Array.from({ length: N }, () => []); entra = Array.from({ length: N }, () => []);
+    for (const [o, t, a, b, rr] of D.arcos) { sai[o].push([t, a, b, rr]); entra[t].push([o, a, b, rr]); }
+    sai.forEach(l => l.sort((x, y) => y[1] - x[1])); entra.forEach(l => l.sort((x, y) => y[1] - x[1]));
+    const cmax = Math.max(...D.nos.c);
+    raio = D.nos.c.map(c => 2 + 9 * Math.sqrt(c / cmax));
+    porBet = [...Array(N).keys()].sort((a, b) => (D.nos.bet[b] ?? 0) - (D.nos.bet[a] ?? 0));
+    rankBet = new Int32Array(N); porBet.forEach((i, r) => rankBet[i] = r + 1);
+    comunidades = [...new Set(D.nos.com)].sort((a, b) => a - b);
+    capDom = {};
+    for (const c of comunidades) {
+      const cont = {};
+      D.nos.com.forEach((k, i) => { if (k === c && D.nos.cap[i]) cont[D.nos.cap[i]] = (cont[D.nos.cap[i]] || 0) + 1; });
+      capDom[c] = Object.entries(cont).sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+    }
+  }
+  const nomeCom = (c) => `${c + 1} · ${D.comunidades[String(c)]}`;
+
+  // ---- estado ------------------------------------------------------------
+  const st = { geo: "rede", cor: "com", fcom: "", fcap: "", esq: true, sel: -1, hover: -1, k: 1, tx: 0, ty: 0 };
+  let css = {};
+  function lerCores() {
+    const s = getComputedStyle(document.documentElement);
+    const g = (n) => s.getPropertyValue(n).trim();
+    css = { surface: g("--surface"), ink: g("--ink"), ink2: g("--ink-2"), muted: g("--muted"), edge: g("--edge"),
+      accent: g("--accent"), outras: g("--outras"), series: [1,2,3,4,5,6,7,8].map(k => g(`--s${k}`)),
+      seq: [1,2,3,4,5].map(k => g(`--seq-${k}`)), neg: g("--div-neg"), mid: g("--div-mid"), pos: g("--div-pos") };
+  }
+
+  // ---- cor por nó ------------------------------------------------------------
+  function hex2rgb(h) { const n = parseInt(h.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; }
+  function mistura(a, b, t) { const x = hex2rgb(a), y = hex2rgb(b); return `rgb(${x.map((v, i) => Math.round(v + (y[i] - v) * t)).join(",")})`; }
+  function corNo(i) {
+    if (st.cor === "com") { const c = D.nos.com[i]; return c < 8 ? css.series[c] : css.outras; }
+    if (st.cor === "part") { const p = D.nos.part[i] ?? 0; return css.seq[Math.min(4, Math.floor(p / 0.2))]; }
+    const d = D.nos.desf[i];
+    if (d == null) return css.outras;
+    return d < 0 ? mistura(css.mid, css.neg, Math.min(1, -d)) : mistura(css.mid, css.pos, Math.min(1, d));
+  }
+  function ativo(i) {
+    if (st.sel >= 0) return i === st.sel || vizSel.has(i);
+    if (st.fcom !== "" && D.nos.com[i] !== +st.fcom) return false;
+    if (st.fcap !== "" && D.nos.cap[i] !== st.fcap) return false;
+    return true;
+  }
+  let vizSel = new Set();
+
+  // ---- canvas --------------------------------------------------------------------
+  const cv = $("cv"), ctx = cv.getContext("2d"), stage = $("stage");
+  let W = 0, H = 0, dpr = 1;
+  const X = (i) => st.geo === "rede" ? D.nos.rx[i] : D.nos.ux[i];
+  const Y = (i) => st.geo === "rede" ? D.nos.ry[i] : D.nos.uy[i];
+  const base = () => Math.min(W, H) * 0.49;
+  const sx = (i) => W / 2 + (X(i) * base()) * st.k + st.tx;
+  const sy = (i) => H / 2 - (Y(i) * base()) * st.k + st.ty;
+  function tamanho() {
+    const r = stage.getBoundingClientRect(); dpr = window.devicePixelRatio || 1;
+    W = r.width; H = r.height; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); pintar();  // redimensionar limpa o canvas: redesenha já
+  }
+  let pedido = 0;
+  function desenhar() { if (!pedido) pedido = requestAnimationFrame(() => { pedido = 0; pintar(); }); }
+  function pintar() {
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = css.surface; ctx.fillRect(0, 0, W, H);
+    if (!D) return;  // dados ainda carregando
+    const filtrando = st.sel >= 0 || st.fcom !== "" || st.fcap !== "";
+    // ligações do esqueleto
+    if (st.esq && st.sel < 0) {
+      ctx.strokeStyle = css.edge; ctx.lineWidth = 0.6; ctx.beginPath();
+      for (const [i, j, , , , e] of D.arestas) {
+        if (!e) continue;
+        if (filtrando && !(ativo(i) && ativo(j))) continue;
+        ctx.moveTo(sx(i), sy(i)); ctx.lineTo(sx(j), sy(j));
+      }
+      ctx.stroke();
+    }
+    // ligações do nó selecionado
+    if (st.sel >= 0) {
+      const lst = viz[st.sel].slice(0, 60), pm = lst.length ? lst[0][1] : 1;
+      ctx.strokeStyle = css.accent;
+      for (const [j, p] of lst) {
+        ctx.globalAlpha = 0.25 + 0.6 * (p / pm); ctx.lineWidth = 0.6 + 2.4 * (p / pm);
+        ctx.beginPath(); ctx.moveTo(sx(st.sel), sy(st.sel)); ctx.lineTo(sx(j), sy(j)); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+    // nós: inativos primeiro, grandes atrás
+    const ordem = [...Array(N).keys()].sort((a, b) => (ativo(a) - ativo(b)) || (raio[b] - raio[a]));
+    const rk = Math.max(1, Math.sqrt(st.k));
+    for (const i of ordem) {
+      const on = !filtrando || ativo(i);
+      ctx.globalAlpha = on ? 1 : 0.12;
+      ctx.beginPath(); ctx.arc(sx(i), sy(i), raio[i] * rk, 0, 2 * Math.PI);
+      ctx.fillStyle = corNo(i); ctx.fill();
+      if (on) { ctx.lineWidth = 1; ctx.strokeStyle = css.surface; ctx.stroke(); }
+    }
+    ctx.globalAlpha = 1;
+    // anel do selecionado / hover
+    for (const i of [st.sel, st.hover]) {
+      if (i < 0) continue;
+      ctx.beginPath(); ctx.arc(sx(i), sy(i), raio[i] * rk + 3, 0, 2 * Math.PI);
+      ctx.lineWidth = 2; ctx.strokeStyle = css.ink; ctx.stroke();
+    }
+    // rótulos de CID: os maiores ativos, mais conforme o zoom
+    ctx.font = `500 11px ${getComputedStyle(document.body).getPropertyValue("--mono") || "monospace"}`;
+    ctx.textBaseline = "middle";
+    const limite = st.sel >= 0 ? 25 : Math.round(30 * st.k * st.k);
+    const cand = [...Array(N).keys()].filter(i => (!filtrando || ativo(i)))
+      .sort((a, b) => D.nos.c[b] - D.nos.c[a]).slice(0, limite);
+    if (st.sel >= 0 && !cand.includes(st.sel)) cand.unshift(st.sel);
+    const ocupado = [];
+    for (const i of cand) {
+      const x = sx(i) + raio[i] * rk + 3, y = sy(i), w = ctx.measureText(D.nos.id[i]).width;
+      if (x < 0 || x > W || y < 0 || y > H) continue;
+      if (ocupado.some(b => x < b[0] + b[2] && x + w > b[0] && Math.abs(y - b[1]) < 12)) continue;
+      ocupado.push([x, y, w]);
+      ctx.fillStyle = css.surface; ctx.globalAlpha = 0.8; ctx.fillRect(x - 1, y - 7, w + 2, 14); ctx.globalAlpha = 1;
+      ctx.fillStyle = css.ink; ctx.fillText(D.nos.id[i], x, y);
+    }
+    // nomes das comunidades (sem seleção e colorindo por comunidade)
+    if (st.sel < 0 && st.cor === "com" && st.fcap === "") {
+      ctx.font = `600 12px ${getComputedStyle(document.body).fontFamily}`;
+      for (const c of comunidades) {
+        if (st.fcom !== "" && c !== +st.fcom) continue;
+        const m = [...Array(N).keys()].filter(i => D.nos.com[i] === c);
+        const xs = m.map(sx).sort((a, b) => a - b), ys = m.map(sy).sort((a, b) => a - b);
+        const x = xs[xs.length >> 1], y = ys[ys.length >> 1], t = nomeCom(c), w = ctx.measureText(t).width;
+        ctx.fillStyle = css.surface; ctx.globalAlpha = 0.88;
+        ctx.fillRect(x - w / 2 - 5, y - 10, w + 10, 20); ctx.globalAlpha = 1;
+        ctx.fillStyle = css.ink; ctx.textAlign = "center"; ctx.fillText(t, x, y); ctx.textAlign = "left";
+      }
+    }
+  }
+
+  // ---- interação no canvas --------------------------------------------------------
+  function maisPerto(px, py) {
+    let best = -1, bd = Infinity; const rk = Math.max(1, Math.sqrt(st.k));
+    for (let i = 0; i < N; i++) {
+      const dx = sx(i) - px, dy = sy(i) - py, d = dx * dx + dy * dy, r = raio[i] * rk + 5;
+      if (d < r * r && d < bd && (st.sel >= 0 || !(st.fcom || st.fcap) || ativo(i))) { bd = d; best = i; }
+    }
+    return best;
+  }
+  let arrasto = null;
+  cv.addEventListener("pointerdown", (e) => { cv.setPointerCapture(e.pointerId); arrasto = { x: e.clientX, y: e.clientY, tx: st.tx, ty: st.ty, moveu: false }; });
+  cv.addEventListener("pointermove", (e) => {
+    const r = cv.getBoundingClientRect(), px = e.clientX - r.left, py = e.clientY - r.top;
+    if (arrasto) {
+      const dx = e.clientX - arrasto.x, dy = e.clientY - arrasto.y;
+      if (Math.abs(dx) + Math.abs(dy) > 3) { arrasto.moveu = true; cv.classList.add("dragging"); }
+      if (arrasto.moveu) { st.tx = arrasto.tx + dx; st.ty = arrasto.ty + dy; esconderTip(); desenhar(); return; }
+    }
+    const i = maisPerto(px, py);
+    if (i !== st.hover) { st.hover = i; desenhar(); }
+    if (i >= 0) mostrarTip(i, px, py); else esconderTip();
+  });
+  cv.addEventListener("pointerup", (e) => {
+    cv.classList.remove("dragging");
+    if (arrasto && !arrasto.moveu) {
+      const r = cv.getBoundingClientRect(); const i = maisPerto(e.clientX - r.left, e.clientY - r.top);
+      selecionar(i);
+    }
+    arrasto = null;
+  });
+  cv.addEventListener("pointerleave", () => { st.hover = -1; esconderTip(); desenhar(); });
+  cv.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const r = cv.getBoundingClientRect(); zoom(Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top);
+  }, { passive: false });
+  function zoom(f, px = W / 2, py = H / 2) {
+    const k = Math.min(40, Math.max(0.5, st.k * f)); f = k / st.k;
+    st.tx = px - W / 2 - (px - W / 2 - st.tx) * f; st.ty = py - H / 2 - (py - H / 2 - st.ty) * f; st.k = k; desenhar();
+  }
+  $("zin").onclick = () => zoom(1.5); $("zout").onclick = () => zoom(1 / 1.5);
+  $("zreset").onclick = () => { st.k = 1; st.tx = 0; st.ty = 0; desenhar(); };
+  function centrar(i) {
+    const alvoK = Math.max(st.k, 2.2); st.k = alvoK;
+    st.tx = -X(i) * base() * st.k; st.ty = Y(i) * base() * st.k;
+  }
+
+  const tip = $("tip");
+  function mostrarTip(i, px, py) {
+    const n = D.nos;
+    tip.innerHTML = `<b>${n.id[i]}</b> ${esc(n.desc[i])}<br>${fmt.format(n.c[i])} pacientes · comunidade ${n.com[i] + 1}${n.cap[i] ? " · cap. " + n.cap[i] : ""}`;
+    tip.hidden = false;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.min(W - tw - 8, px + 14) + "px"; tip.style.top = Math.max(8, Math.min(H - th - 8, py + 14)) + "px";
+  }
+  function esconderTip() { tip.hidden = true; }
+  function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+  // ---- seleção e painel -----------------------------------------------------------
+  function selecionar(i, recentrar = false) {
+    st.sel = i; vizSel = new Set(i >= 0 ? viz[i].slice(0, 60).map(v => v[0]) : []);
+    if (i >= 0 && recentrar) centrar(i);
+    painel(); desenhar();
+  }
+  function linhaNo(j, direita, titulo = "") {
+    return `<button type="button" class="lnk" data-i="${j}" title="${esc(titulo)}"><span class="cid">${D.nos.id[j]}</span><span>${esc(D.nos.desc[j])}</span><span>${direita}</span></button>`;
+  }
+  function painel() {
+    const P = $("painel");
+    if (st.sel < 0) {
+      const top = porBet.slice(0, 10);
+      P.innerHTML = `<h2>Explorar</h2>
+        <p class="hint">Clique num ponto para ver com quais doenças ele se liga e o que costuma vir antes e depois. Arraste para mover; role para aproximar.</p>
+        <h2>Pontes mais centrais</h2>
+        <div class="lst">${top.map(j => linhaNo(j, fmt2(D.nos.bet[j], 3))).join("")}</div>`;
+    } else {
+      const i = st.sel, n = D.nos, c = n.com[i];
+      const cor = c < 8 ? css.series[c] : css.outras;
+      const pct = (a, b) => Math.round(100 * a / (a + b)) + "%";
+      P.innerHTML = `<button type="button" class="clear" id="limpar">← Voltar à visão geral</button>
+        <div><div class="big">${n.id[i]}</div><div class="desc">${esc(n.desc[i])}</div></div>
+        <dl class="facts">
+          <dt>Comunidade</dt><dd><span class="sw" style="display:inline-block;background:${cor};margin-right:6px"></span>${esc(nomeCom(c))}</dd>
+          <dt>Capítulo</dt><dd>${n.cap[i] ? esc(n.cap[i] + " · " + (D.capitulos[n.cap[i]] || "")) : "—"}</dd>
+          <dt>Pacientes</dt><dd>${fmt.format(n.c[i])} (${fmt2(n.prev[i], 2)} por mil)</dd>
+          <dt>Ligações</dt><dd>${fmt.format(n.grau[i])}</dd>
+          <dt>Betweenness</dt><dd>${fmt2(n.bet[i], 4)} · ${rankBet[i]}ª de ${N}</dd>
+          <dt>Participação</dt><dd>${fmt2(n.part[i], 2)} <span class="muted">(0 = só a própria comunidade)</span></dd>
+          <dt>Gatilho ↔ desfecho</dt><dd>${n.desf[i] == null ? "—" : fmt2(n.desf[i], 2)} <span class="muted">(−1 inicia, +1 encerra)</span></dd>
+        </dl>
+        <h2>Associações mais fortes (φ · RR)</h2>
+        <div class="lst">${viz[i].slice(0, 12).map(([j, p, rr, cc]) => linhaNo(j, `${fmt2(p, 3)} · ${fmt2(rr, 1)}`, fmt.format(cc) + " pacientes com as duas")).join("") || '<p class="hint">Sem associações.</p>'}</div>
+        <h2>Costuma levar a</h2>
+        <div class="lst">${sai[i].slice(0, 8).map(([j, a, b]) => linhaNo(j, `${fmt.format(a)} · ${pct(a, b)}`, `${a} pacientes nesta ordem, ${b} na inversa`)).join("") || '<p class="hint">Nenhuma trajetória com direção significativa.</p>'}</div>
+        <h2>Costuma vir depois de</h2>
+        <div class="lst">${entra[i].slice(0, 8).map(([j, a, b]) => linhaNo(j, `${fmt.format(a)} · ${pct(a, b)}`, `${a} pacientes nesta ordem, ${b} na inversa`)).join("") || '<p class="hint">Nenhuma trajetória com direção significativa.</p>'}</div>
+        <p class="muted">Nas trajetórias: pacientes nesta ordem · % de todos os que tiveram as duas em 1–60 meses.</p>`;
+      $("limpar").onclick = () => selecionar(-1);
+    }
+    P.querySelectorAll(".lnk").forEach(b => b.onclick = () => selecionar(+b.dataset.i, true));
+  }
+
+  // ---- legenda ---------------------------------------------------------------
+  function legenda() {
+    const L = $("legenda");
+    if (st.cor === "com") {
+      const linhas = comunidades.slice(0, 8).map(c => `<div class="row"><span class="sw" style="background:${css.series[c]}"></span>${esc(nomeCom(c))}</div>`);
+      if (comunidades.length > 8) linhas.push(`<div class="row"><span class="sw" style="background:${css.outras}"></span>Outras (${comunidades.slice(8).map(c => c + 1).join(", ")})</div>`);
+      L.innerHTML = linhas.join("");
+    } else if (st.cor === "part") {
+      L.innerHTML = `<div>Participação: fração das ligações fora da própria comunidade</div>
+        <div class="ramp">${css.seq.map(c => `<i style="background:${c}"></i>`).join("")}</div>
+        <div class="ends"><span>0</span><span>0,5</span><span>1</span></div>`;
+    } else {
+      L.innerHTML = `<div>Posição nas trajetórias dirigidas</div>
+        <div class="ramp"><i style="background:${css.neg}"></i><i style="background:${mistura(css.mid, css.neg, 0.5)}"></i><i style="background:${css.mid}"></i><i style="background:${mistura(css.mid, css.pos, 0.5)}"></i><i style="background:${css.pos}"></i></div>
+        <div class="ends"><span>gatilho −1</span><span>+1 desfecho</span></div>`;
+    }
+  }
+
+  // ---- controles --------------------------------------------------------------
+  for (const [id, g] of [["geo-rede", "rede"], ["geo-umap", "umap"]]) {
+    $(id).onclick = () => {
+      st.geo = g; $("geo-rede").setAttribute("aria-pressed", g === "rede"); $("geo-umap").setAttribute("aria-pressed", g === "umap");
+      if (st.sel >= 0) centrar(st.sel); else { st.k = 1; st.tx = 0; st.ty = 0; }
+      desenhar();
+    };
+  }
+  $("cor").onchange = (e) => { st.cor = e.target.value; legenda(); desenhar(); };
+  $("fcom").onchange = (e) => { st.fcom = e.target.value; if (st.sel >= 0) selecionar(-1); desenhar(); };
+  $("fcap").onchange = (e) => { st.fcap = e.target.value; if (st.sel >= 0) selecionar(-1); desenhar(); };
+  $("esq").onchange = (e) => { st.esq = e.target.checked; desenhar(); };
+  const romano = (r) => ({ I:1,II:2,III:3,IV:4,V:5,VI:6,VII:7,VIII:8,IX:9,X:10,XI:11,XII:12,XIII:13,XIV:14,XV:15,XVI:16,XVII:17,XVIII:18,XIX:19,XX:20,XXI:21,XXII:22 }[r] || 99);
+  function popularControles() {
+    $("fcom").innerHTML = '<option value="">Todas</option>' +
+      comunidades.map(c => `<option value="${c}">${esc(nomeCom(c))}</option>`).join("");
+    const caps = [...new Set(D.nos.cap.filter(Boolean))].sort((a, b) => romano(a) - romano(b));
+    $("fcap").innerHTML = '<option value="">Todos</option>' +
+      caps.map(c => `<option value="${c}">${c} · ${esc(D.capitulos[c] || "")}</option>`).join("");
+    $("lista-cid").innerHTML = D.nos.id.map((c, i) => `<option value="${c} — ${esc(D.nos.desc[i])}"></option>`).join("");
+  }
+  $("busca").addEventListener("change", (e) => {
+    const q = e.target.value.trim(); if (!q) return;
+    const cod = q.split(/\s|—/)[0].toUpperCase();
+    let i = idx.has(cod) ? idx.get(cod) : -1;
+    if (i < 0) { const ql = q.toLowerCase(); i = D.nos.desc.findIndex(d => d.toLowerCase().includes(ql)); }
+    if (i >= 0) { st.fcom = ""; st.fcap = ""; $("fcom").value = ""; $("fcap").value = ""; selecionar(i, true); }
+  });
+  window.addEventListener("keydown", (e) => { if (e.key === "Escape" && st.sel >= 0) selecionar(-1); });
+
+  // ---- tabelas ---------------------------------------------------------------
+  function tabelas() {
+    const linhas = comunidades.map(c => {
+      const m = [...Array(N).keys()].filter(i => D.nos.com[i] === c).sort((a, b) => D.nos.c[b] - D.nos.c[a]);
+      const cor = c < 8 ? css.series[c] : css.outras;
+      return `<tr class="click" data-c="${c}"><td class="num">${c + 1}</td>
+        <td><span class="sw" style="display:inline-block;background:${cor}"></span></td>
+        <td><span class="cid">${esc(D.comunidades[String(c)])}</span><div class="muted">${m.slice(0, 5).map(i => esc(D.nos.id[i] + " " + D.nos.desc[i])).join(" · ")}</div></td>
+        <td class="num">${m.length}</td><td>${esc(capDom[c] + " · " + (D.capitulos[capDom[c]] || ""))}</td></tr>`;
+    });
+    $("t-com").innerHTML = `<thead><tr><th>#</th><th></th><th>Núcleo (5 mais prevalentes abaixo)</th><th>CID-3</th><th>Capítulo dominante</th></tr></thead><tbody>${linhas.join("")}</tbody>`;
+    $("t-com").querySelectorAll("tr.click").forEach(tr => tr.onclick = () => {
+      st.fcom = tr.dataset.c; $("fcom").value = tr.dataset.c; st.fcap = ""; $("fcap").value = ""; selecionar(-1);
+      stage.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    $("t-pontes").innerHTML = `<thead><tr><th>CID</th><th>Doença</th><th>Betw.</th><th>Partic.</th><th>Com.</th></tr></thead><tbody>${
+      porBet.slice(0, 20).map(i => `<tr class="click" data-i="${i}"><td class="cid">${D.nos.id[i]}</td><td>${esc(D.nos.desc[i])}</td><td class="num">${fmt2(D.nos.bet[i], 3)}</td><td class="num">${fmt2(D.nos.part[i], 2)}</td><td class="num">${D.nos.com[i] + 1}</td></tr>`).join("")}</tbody>`;
+    $("t-pontes").querySelectorAll("tr.click").forEach(tr => tr.onclick = () => { selecionar(+tr.dataset.i, true); stage.scrollIntoView({ behavior: "smooth", block: "center" }); });
+  }
+
+  // ---- cabeçalho ------------------------------------------------------------------
+  function cabecalho() {
+    const nome = D.estrato_nome || D.estrato;
+    const rec = D.recorte_nome || "";
+    $("titulo").textContent = `Mapa de doenças do SUS${rec ? " · " + rec : ""} · ${nome}`;
+    document.title = `Mapa de Doenças · ${rec ? rec + " · " : ""}${nome}`;
+    $("recorte-txt").textContent = D.recorte_txt || "";
+    $("nums").innerHTML = `<span><b>${fmt.format(D.n_pacientes || 0)}</b> pacientes com CID</span><span><b>${fmt.format(N)}</b> categorias CID-3</span><span><b>${fmt.format(D.arestas.length)}</b> associações</span><span><b>${fmt.format(D.arcos.length)}</b> trajetórias com direção</span><span><b>${comunidades.length}</b> comunidades (Leiden, γ = 1)</span>`;
+  }
+
+  // ---- troca de estrato --------------------------------------------------------------
+  function usar(dados) {
+    D = dados; indexar();
+    Object.assign(st, { fcom: "", fcap: "", sel: -1, hover: -1, k: 1, tx: 0, ty: 0 });
+    vizSel = new Set(); $("busca").value = "";
+    popularControles(); cabecalho(); legenda(); tabelas(); painel();
+    tamanho(); pintar();  // síncrono: o 1º quadro não depende de requestAnimationFrame
+  }
+  async function carregar(id) {
+    const e = INDICE.estratos.find(x => x.id === id) || INDICE.estratos[0];
+    marcar(e.id);
+    try { history.replaceState(null, "", "#" + e.id); } catch (_) { /* moldura sem history */ }
+    $("painel").innerHTML = '<p class="hint">Carregando…</p>';
+    const r = await fetch(`dados/${e.arquivo}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status} em dados/${e.arquivo}`);
+    usar(await r.json());
+    $("baixar-nos").href = `tabelas/${e.id}_doencas.csv`;
+    $("baixar-arestas").href = `tabelas/${e.id}_ligacoes.csv`;
+  }
+  let INDICE = null;
+
+  // ---- filtros de população (um recorte por vez) ---------------------------------
+  const curto = (nome) => nome.replace(/\s*\(.*\)$/, "");
+  function montarFiltros() {
+    const geral = INDICE.estratos.find(e => e.grupo === "Geral");
+    const grupos = {};
+    for (const e of INDICE.estratos) if (e.grupo !== "Geral") (grupos[e.grupo] ||= []).push(e);
+    $("pops").innerHTML = Object.entries(grupos).map(([g, es]) => `
+      <div class="pop-row" role="group" aria-label="${esc(g)}"><span class="lbl">${esc(g)}</span>
+        <button type="button" class="chip" data-grupo="${esc(g)}" data-id="${geral ? geral.id : ""}">Todos</button>
+        ${es.map(e => `<button type="button" class="chip" data-grupo="${esc(g)}" data-id="${e.id}"
+            title="${esc(e.nome)} · ${fmt.format(e.n_pacientes)} pacientes">${esc(curto(e.nome))}</button>`).join("")}
+      </div>`).join("");
+    $("pops").querySelectorAll(".chip").forEach(b => b.onclick = () => carregar(b.dataset.id));
+  }
+  function marcar(id) {
+    const ativo = INDICE.estratos.find(e => e.id === id);
+    $("pops").querySelectorAll(".chip").forEach(b => {
+      const mesmoGrupo = ativo && b.dataset.grupo === ativo.grupo;
+      const on = mesmoGrupo ? b.dataset.id === id : b.textContent.trim() === "Todos";
+      b.setAttribute("aria-pressed", on);
+    });
+  }
+
+  // ---- tema ---------------------------------------------------------------------
+  function tema() { lerCores(); if (D) { legenda(); tabelas(); painel(); } desenhar(); }
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", tema);
+  new MutationObserver(tema).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  new ResizeObserver(tamanho).observe(stage);
+  lerCores(); tamanho();
+
+  // ---- início: dados embutidos (arquivo único) ou índice de estratos (site) ----------
+  (async () => {
+    const embutido = document.getElementById("dados").textContent.trim();
+    if (embutido && !embutido.startsWith("/*")) {
+      $("ctl-estrato").hidden = true;
+      $("links").hidden = true;  // arquivo único: sem método nem tabelas ao lado
+      usar(JSON.parse(embutido));
+      return;
+    }
+    try {
+      const r = await fetch("dados/estratos.json");
+      INDICE = await r.json();
+      montarFiltros();
+      await carregar(location.hash.slice(1));
+    } catch (err) {
+      $("painel").innerHTML = `<h2>Não foi possível carregar os dados</h2>
+        <p class="hint">Abrindo o arquivo direto do disco, o navegador bloqueia a leitura dos dados. Rode, na pasta do site:</p>
+        <p class="cid">python -m http.server 8000</p>
+        <p class="hint">e abra http://localhost:8000. (${esc(err.message)})</p>`;
+    }
+  })();
+})();
+</script>

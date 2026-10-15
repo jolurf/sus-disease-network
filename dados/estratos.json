@@ -1,0 +1,150 @@
+{
+ "recorte": "Brasil",
+ "periodo": "residentes no Brasil, 2014–2023",
+ "estratos": [
+  {
+   "id": "geral",
+   "arquivo": "geral.json",
+   "grupo": "Geral",
+   "nome": "Todos os pacientes",
+   "n_pacientes": 67456248,
+   "arestas": 102242
+  },
+  {
+   "id": "sexo_F",
+   "arquivo": "sexo_F.json",
+   "grupo": "Sexo",
+   "nome": "Mulheres",
+   "n_pacientes": 37700062,
+   "arestas": 80531
+  },
+  {
+   "id": "sexo_M",
+   "arquivo": "sexo_M.json",
+   "grupo": "Sexo",
+   "nome": "Homens",
+   "n_pacientes": 29646402,
+   "arestas": 65209
+  },
+  {
+   "id": "idade_0-17",
+   "arquivo": "idade_0-17.json",
+   "grupo": "Faixa etária",
+   "nome": "0 a 17 anos",
+   "n_pacientes": 11321584,
+   "arestas": 26522
+  },
+  {
+   "id": "idade_18-39",
+   "arquivo": "idade_18-39.json",
+   "grupo": "Faixa etária",
+   "nome": "18 a 39 anos",
+   "n_pacientes": 20353176,
+   "arestas": 36243
+  },
+  {
+   "id": "idade_40-59",
+   "arquivo": "idade_40-59.json",
+   "grupo": "Faixa etária",
+   "nome": "40 a 59 anos",
+   "n_pacientes": 21263563,
+   "arestas": 51491
+  },
+  {
+   "id": "idade_60-79",
+   "arquivo": "idade_60-79.json",
+   "grupo": "Faixa etária",
+   "nome": "60 a 79 anos",
+   "n_pacientes": 15328812,
+   "arestas": 53673
+  },
+  {
+   "id": "idade_80mais",
+   "arquivo": "idade_80mais.json",
+   "grupo": "Faixa etária",
+   "nome": "80 ou mais anos",
+   "n_pacientes": 2588982,
+   "arestas": 12832
+  },
+  {
+   "id": "regiao_Centro-Oeste",
+   "arquivo": "regiao_Centro-Oeste.json",
+   "grupo": "Região",
+   "nome": "Centro-Oeste",
+   "n_pacientes": 5435662,
+   "arestas": 26167
+  },
+  {
+   "id": "regiao_Nordeste",
+   "arquivo": "regiao_Nordeste.json",
+   "grupo": "Região",
+   "nome": "Nordeste",
+   "n_pacientes": 13839751,
+   "arestas": 33811
+  },
+  {
+   "id": "regiao_Norte",
+   "arquivo": "regiao_Norte.json",
+   "grupo": "Região",
+   "nome": "Norte",
+   "n_pacientes": 3958810,
+   "arestas": 18030
+  },
+  {
+   "id": "regiao_Sudeste",
+   "arquivo": "regiao_Sudeste.json",
+   "grupo": "Região",
+   "nome": "Sudeste",
+   "n_pacientes": 32721231,
+   "arestas": 79552
+  },
+  {
+   "id": "regiao_Sul",
+   "arquivo": "regiao_Sul.json",
+   "grupo": "Região",
+   "nome": "Sul",
+   "n_pacientes": 11500794,
+   "arestas": 42177
+  },
+  {
+   "id": "raca_Amarela",
+   "arquivo": "raca_Amarela.json",
+   "grupo": "Raça/cor",
+   "nome": "Amarela (registro inflado no SIA)",
+   "n_pacientes": 4722727,
+   "arestas": 24758
+  },
+  {
+   "id": "raca_Branca",
+   "arquivo": "raca_Branca.json",
+   "grupo": "Raça/cor",
+   "nome": "Branca",
+   "n_pacientes": 28787995,
+   "arestas": 79023
+  },
+  {
+   "id": "raca_Indígena",
+   "arquivo": "raca_Indígena.json",
+   "grupo": "Raça/cor",
+   "nome": "Indígena",
+   "n_pacientes": 63269,
+   "arestas": 448
+  },
+  {
+   "id": "raca_Parda",
+   "arquivo": "raca_Parda.json",
+   "grupo": "Raça/cor",
+   "nome": "Parda",
+   "n_pacientes": 23022657,
+   "arestas": 58938
+  },
+  {
+   "id": "raca_Preta",
+   "arquivo": "raca_Preta.json",
+   "grupo": "Raça/cor",
+   "nome": "Preta",
+   "n_pacientes": 3626549,
+   "arestas": 23827
+  }
+ ]
+}
